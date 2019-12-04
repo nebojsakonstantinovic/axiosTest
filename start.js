@@ -8,7 +8,7 @@ async function getTodos() {
   try {
     const response = await axios.get(
       "https://jsonplaceholder.typicode.com/todos",
-      { params: { _limit: 4 } }
+      { params: { _limit: 4 }, timeout: 5000 }
     );
     console.log(response);
 
@@ -163,7 +163,7 @@ async function errorHandling() {
   try {
     const response = await axios.get(
       "https://jsonplaceholder.typicode.com/todos7",
-      { params: { _limit: 4 } }
+      { params: { _limit: 4 }, validateStatus: status => status < 500 }
     );
     console.log(response);
 
@@ -182,8 +182,25 @@ async function errorHandling() {
 }
 
 // CANCEL TOKEN
-function cancelToken() {
+async function cancelToken() {
   console.log("Cancel Token");
+
+  const source = axios.CancelToken.source();
+
+  if (true) {
+    source.cancel("Requset canceled");
+  }
+  try {
+    const response = await axios.get(
+      "https://jsonplaceholder.typicode.com/todos",
+      { cancelToken: source.token }
+    );
+    console.log(response);
+
+    showOutput(response);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 // INTERCEPTING REQUESTS & RESPONSES
@@ -202,6 +219,14 @@ axios.interceptors.request.use(
 );
 
 // AXIOS INSTANCES
+const axiosInstance = axios.create({
+  baseURL: "https://jsonplaceholder.typicode.com"
+});
+
+// axiosInstance
+//   .get("/comments")
+//   .then(res => showOutput(res))
+//   .catch(err => console.error(err));
 
 // Show output in browser
 function showOutput(res) {
